@@ -1,0 +1,1 @@
+{"name":"diamond-bank","version":"1.0.0","private":true,"description":"Java Spring Boot and PostgreSQL banking portfolio app","scripts":{"start":"pwsh -File scripts/start-local.ps1","test":"pwsh -File scripts/start-local.ps1 -Test"}}
