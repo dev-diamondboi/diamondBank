@@ -1,0 +1,10 @@
+.git
+.github
+.tools
+.runtime
+target
+.env
+.env.*
+portfolio
+*.log
+.idea

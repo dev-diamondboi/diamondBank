@@ -10,7 +10,7 @@ In PowerShell 7, from the project folder:
 ./scripts/start-local.ps1
 ```
 
-Open **http://localhost:8080**, select **Create a demo account**, and choose a name, email and password. Each user receives independent checking/savings accounts, demo opening funds and savings goals. No real account is opened and no email is sent.
+Open **http://localhost:8080**, select **Open an account**, and choose a name, email and password. Each user receives independent checking/savings accounts, demo opening funds and savings goals. No real account is opened and no email is sent.
 
 The script uses the installed Java 21 and PostgreSQL 17, initializes a separate database cluster under `.runtime/postgres`, and starts it on **127.0.0.1:55432**. It does not modify existing databases. It creates `diamond_bank` for the app and `diamond_bank_test` for tests. Credentials are generated in ignored `.runtime/db-password`; do not commit that directory.
 
@@ -87,8 +87,15 @@ PostgreSQL integration tests cover authentication, CSRF, password validation/has
 
 ## Portfolio scope
 
-This is a real Java/database architecture with simulated financial operations, not a production bank. It does not include real banking integrations, email verification, password recovery, MFA, login rate limiting, payment settlement, immutable regulatory audit retention or compliance certification. Reset deliberately replaces demo activity. Sessions expire after 30 minutes and do not survive server restarts. Public hosting would require appropriate additional controls, HTTPS and `COOKIE_SECURE=true`.
+This is a real Java/database architecture with simulated financial operations, not a production bank. It does not include real banking integrations, email verification, password recovery, MFA, login rate limiting, payment settlement, immutable regulatory audit retention or compliance certification. Reset deliberately replaces demo activity. Sessions expire after 30 minutes of inactivity and are stored in PostgreSQL so they survive container restarts. Public hosting would require appropriate additional controls, HTTPS and `COOKIE_SECURE=true`.
 
 Python is intentionally not in the core transaction path. A later analytics or fraud-simulation service can add Python without duplicating financial logic.
 
 The original localStorage demo is no longer used or imported. Google Fonts are optional and have system-font fallbacks.
+
+
+## Hosted deployment
+
+The hosted setup uses **Vercel for the static frontend, Render for the Java API, and Neon for PostgreSQL**. The root `vercel.json` forwards `/api/*` to `https://diamondbank.onrender.com/api/*`, keeping browser requests on the frontend origin. Render builds the root `Dockerfile`; database credentials are configured only on Render.
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for environment variables, deployment settings and hosted verification steps.

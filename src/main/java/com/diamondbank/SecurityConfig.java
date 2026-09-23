@@ -23,7 +23,7 @@ class SecurityConfig {
             .formLogin(f -> f.loginProcessingUrl("/api/login")
                 .successHandler((req,res,auth) -> res.setStatus(204))
                 .failureHandler((req,res,err) -> { res.setStatus(401); res.setContentType("application/json"); res.getWriter().write("{\"message\":\"Email or password is incorrect.\"}"); }).permitAll())
-            .logout(l -> l.logoutUrl("/api/logout").invalidateHttpSession(true).deleteCookies("JSESSIONID")
+            .logout(l -> l.logoutUrl("/api/logout").invalidateHttpSession(true).deleteCookies("SESSION")
                 .logoutSuccessHandler((req,res,auth) -> res.setStatus(204)))
             .exceptionHandling(e -> e.authenticationEntryPoint((req,res,err) -> res.sendError(401))
                 .accessDeniedHandler((req,res,err) -> res.sendError(403))).build();

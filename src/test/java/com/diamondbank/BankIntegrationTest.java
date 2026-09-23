@@ -47,10 +47,13 @@ class BankIntegrationTest {
         mvc.perform(post("/api/login").with(csrf()).param("username",email).param("password","wrong")).andExpect(status().isUnauthorized());
         var login=mvc.perform(post("/api/login").with(csrf()).param("username",email).param("password",password))
             .andExpect(status().isNoContent()).andReturn();
-        var session=(org.springframework.mock.web.MockHttpSession)login.getRequest().getSession(false);
-        mvc.perform(get("/api/state").session(session)).andExpect(status().isOk()).andExpect(jsonPath("$.user.email").value(email));
-        mvc.perform(post("/api/logout").session(session).with(csrf())).andExpect(status().isNoContent());
-        assertTrue(session.isInvalid());
+        var cookie=login.getResponse().getCookie("SESSION");
+        assertNotNull(cookie);
+        mvc.perform(get("/api/state").cookie(cookie)).andExpect(status().isOk()).andExpect(jsonPath("$.user.email").value(email));
+        assertEquals(1,db.queryForObject("SELECT COUNT(*) FROM spring_session WHERE principal_name=?",Integer.class,email));
+        mvc.perform(post("/api/logout").cookie(cookie).with(csrf())).andExpect(status().isNoContent());
+        mvc.perform(get("/api/state").cookie(cookie)).andExpect(status().isUnauthorized());
+        assertEquals(0,db.queryForObject("SELECT COUNT(*) FROM spring_session WHERE principal_name=?",Integer.class,email));
     }
     @Test void registrationValidatesPasswordsAndDuplicates() throws Exception {
         mvc.perform(post("/api/register").with(csrf()).contentType("application/json")
